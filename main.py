@@ -1,6 +1,9 @@
 import numpy as np
 import matplotlib.pyplot as plt
 from scipy.optimize import minimize
+import scipy.stats as stats
+import math
+import statistics
 
 data = np.loadtxt('fourierc.txt')
 t = data[:, 0]
@@ -51,3 +54,38 @@ result = minimize(likelihood, initial_guess, method='BFGS')
 estimated_a = result.x[0]
 print("Estimador de máxima verosimilitud para a:", estimated_a)
 
+#Ejercicio 2.1 ->
+alpha = 5*10**5
+Wn = np.random.randn(1000)
+Xn_prima = 0.1 * np.cos(2 * np.pi * alpha * t) + Wn
+err = 2.5*10**5
+count = 0
+
+def likelihood_2(a,i):
+    mean = 0.1 * np.cos(2 * np.pi * a * Tn[i])
+    residuals = Xn_prima[i] - mean
+    likelihood = (residuals) ** 2
+    return -likelihood
+
+for i in range(len(Xn_prima)):
+    result_2 = minimize(likelihood_2, err, (i), method='BFGS')
+    if (result_2.x - err < 0):
+        count += 1
+    estimated_alpha = result_2.x
+
+prob = count/len(Xn_prima)
+print("Probabilidad de cometer un error:", prob)
+
+#Ejercicio 2.2 ->
+sum_Xn_prima = 0
+mean = statistics.mean(Xn_prima)
+diff = 0
+for i in Xn_prima:
+    diff += (i - mean) ** 2
+sigma = math.sqrt(diff/(len(Xn_prima) - 1))
+
+gamma =  (1 + 0.95) /2  
+
+delta = (sigma/math.sqrt(len(Xn_prima))) * stats.norm.ppf(gamma, 0, 1)
+
+print('[ %f , %f ]' %  (mean - delta, mean + delta))
