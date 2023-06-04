@@ -4,36 +4,26 @@ from scipy.optimize import minimize
 import scipy.stats as stats
 import math
 import statistics
+from scipy.stats import norm
 
+#Obtenemos datos de archivo
 data = np.loadtxt('fourierc.txt')
 t = data[:, 0]
 x = data[:, 1]
 
-# plt.plot(x, t, 'o')
-# plt.xlabel('x')
-# plt.ylabel('t')
-# plt.title('Gráfico de puntos (x, t)')
-# plt.grid(True)
-# plt.show()
-
+# #Graficamos histograma con poligono de frecuencias
 # plt.hist(x, bins='auto', alpha=0.7, rwidth=0.85, label='Histograma')
-
 # n, bins, patches = plt.hist(x, bins='auto', alpha=0)
-
 # x_polygon = []
 # y_polygon = []
-
 # for i in range(len(bins) - 1):
 #     x_polygon.append((bins[i] + bins[i+1]) /2)
 #     y_polygon.append(n[i])
-
 # plt.plot(x_polygon, y_polygon, 'r-', linewidth=2, label='Polígono de frecuencias')
-
 # plt.legend()
 # plt.xlabel('Valores de x')
 # plt.ylabel('Frecuencia')
 # plt.title('Histograma con polígono de frecuencias')
-
 # plt.show()
 
 def likelihood(a):
@@ -43,8 +33,6 @@ def likelihood(a):
     likelihood = np.sum((Xn-mean) ** 2) #El denominador 2*desvio**2 es el mismo para todos los Xi
     return -likelihood
 
-
-# Xn = 0.1 * np.cos(2 * np.pi * a * t) + Wn
 Xn= x
 Tn=t
 a = 1.0 
@@ -53,6 +41,24 @@ initial_guess = 1.0
 result = minimize(likelihood, initial_guess, method='BFGS')
 estimated_a = result.x[0]
 print("Estimador de máxima verosimilitud para a:", estimated_a)
+
+#Ejercicio 1.c ->
+Zn = Xn - 0.1 * np.cos(2* np.pi * estimated_a *Tn)
+mu, sigma = norm.fit(Zn)
+# plt.hist(Zn, bins='auto', alpha=0.7, rwidth=0.85, label='Histograma')
+n, bins, patches = plt.hist(Zn, bins='auto', alpha=0)
+n = n/1000
+
+cdfs = []
+for i in range(len(bins) - 1):
+    cdf = norm.cdf(bins[i+1], loc=mu, scale=sigma) - norm.cdf(bins[i], loc=mu, scale=sigma)
+    cdfs.append(cdf)
+
+error = 0
+for i in range(len(n)):
+    error += (n[i] - cdfs[i])**2
+
+print(error)
 
 #Ejercicio 2.1 ->
 alpha = 5*10**5
