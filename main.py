@@ -11,20 +11,20 @@ data = np.loadtxt('fourierc.txt')
 t = data[:, 0]
 x = data[:, 1]
 
-# #Graficamos histograma con poligono de frecuencias
-# plt.hist(x, bins='auto', alpha=0.7, rwidth=0.85, label='Histograma')
-# n, bins, patches = plt.hist(x, bins='auto', alpha=0)
-# x_polygon = []
-# y_polygon = []
-# for i in range(len(bins) - 1):
-#     x_polygon.append((bins[i] + bins[i+1]) /2)
-#     y_polygon.append(n[i])
-# plt.plot(x_polygon, y_polygon, 'r-', linewidth=2, label='Polígono de frecuencias')
-# plt.legend()
-# plt.xlabel('Valores de x')
-# plt.ylabel('Frecuencia')
-# plt.title('Histograma con polígono de frecuencias')
-# plt.show()
+#Graficamos histograma con poligono de frecuencias
+plt.hist(x, bins='auto', alpha=0.7, rwidth=0.85, label='Histograma')
+n, bins, patches = plt.hist(x, bins='auto', alpha=0)
+x_polygon = []
+y_polygon = []
+for i in range(len(bins) - 1):
+    x_polygon.append((bins[i] + bins[i+1]) /2)
+    y_polygon.append(n[i])
+plt.plot(x_polygon, y_polygon, 'r-', linewidth=2, label='Polígono de frecuencias')
+plt.legend()
+plt.xlabel('Valores de x')
+plt.ylabel('Frecuencia')
+plt.title('Histograma con polígono de frecuencias')
+plt.show()
 
 def likelihood(a):
     #No agrego el termino sum(1/sqrt(2*pi*desvio**2)) ya que sera el mismo para todos los Xi
@@ -58,7 +58,7 @@ error = 0
 for i in range(len(n)):
     error += (n[i] - cdfs[i])**2
 
-print(error)
+print("err", error)
 
 #Ejercicio 2.1 ->
 alpha = 5*10**5
@@ -83,15 +83,8 @@ prob = count/len(Xn_prima)
 print("Probabilidad de cometer un error:", prob)
 
 #Ejercicio 2.2 ->
-sum_Xn_prima = 0
-mean = statistics.mean(Xn_prima)
-diff = 0
-for i in Xn_prima:
-    diff += (i - mean) ** 2
-sigma = math.sqrt(diff/(len(Xn_prima) - 1))
-
 gamma =  (1 + 0.95) /2  
 
-delta = (sigma/math.sqrt(len(Xn_prima))) * stats.norm.ppf(gamma, 0, 1)
+delta = (math.sqrt(prob*(1-prob)/len(Xn_prima))) * stats.norm.ppf(gamma, 0, 1)
 
-print('[ %f , %f ]' %  (mean - delta, mean + delta))
+print('[ %f , %f ]' %  (prob - delta, prob + delta))
